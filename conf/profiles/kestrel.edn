@@ -1,0 +1,5 @@
+{:jobs
+ {:kestrel [{:service "kestrel-stats" :interval 20
+             :type :clj
+             :job-ns "cauchy.jobs.kestrel"
+             :job-fn "kestrel-stats"}]}}
