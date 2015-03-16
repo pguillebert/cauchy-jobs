@@ -52,7 +52,7 @@
                     (into {}))]
      (for [[queue data] infos
            [sname value] data]
-       {:service (str queue "_" sname)
+       {:service (str queue "." sname)
         :metric value
         :state (utils/threshold (get thresholds sname) value)})))
   ([] (kestrel-stats {})))
