@@ -3,8 +3,8 @@
             [cauchy.jobs.utils :as utils]))
 
 (defn fetch-stats
-  [{:keys [host port] :or {host "localhost" port 3334}}]
-  (let [url (str "http://" host ":" port "/stats")]
+  [{:keys [host port period] :or {host "localhost" port 3334 period 3600}}]
+  (let [url (str "http://" host ":" port "/stats?period=" period)]
     (:body (http/get url {:as :json}))))
 
 (defn all-queues
@@ -24,13 +24,13 @@
   (keyword (str "q/" queue "/" metric)))
 
 (defn get-queue-info
-  [stats queue]
+  [stats queue period]
   (let [items (get-in stats [:gauges (mk-key queue "items")])
         age (get-in stats [:gauges (mk-key queue "age_msec")])
         put (get-in stats [:counters (mk-key queue "put_items")])
         get (get-in stats [:counters (mk-key queue "get_items_hit")])
-        put-rate (utils/rate [:kestrel (keyword queue) :put-rate] put)
-        get-rate (utils/rate [:kestrel (keyword queue) :get-rate] get)]
+        put-rate (double (/ put period))
+        get-rate (double (/ get period)) ]
     {"items" items "age" age
      "put_rate" put-rate "get_rate" get-rate}))
 
@@ -41,14 +41,14 @@
    "get_rate" {:warn 0.5 :crit 0.01 :comp <}})
 
 (defn kestrel-stats
-  ([{:keys [thresholds host port]
-     :or {thresholds default-thresholds}
+  ([{:keys [thresholds host port period]
+     :or {thresholds default-thresholds period 3600}
      :as conf}]
    (let [stats (fetch-stats conf)
          infos (->> (all-queues stats)
                     (map (fn [queue]
                            [queue
-                            (get-queue-info stats queue)]))
+                            (get-queue-info stats queue period)]))
                     (into {}))]
      (for [[queue data] infos
            [sname value] data]
