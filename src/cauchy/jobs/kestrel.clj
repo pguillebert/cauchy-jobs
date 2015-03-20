@@ -42,9 +42,10 @@
 
 (defn kestrel-stats
   ([{:keys [thresholds host port period]
-     :or {thresholds default-thresholds period 3600}
+     :or {period 3600}
      :as conf}]
-   (let [stats (fetch-stats conf)
+   (let [thresholds (merge-with merge default-thresholds thresholds)
+         stats (fetch-stats conf)
          infos (->> (all-queues stats)
                     (map (fn [queue]
                            [queue
