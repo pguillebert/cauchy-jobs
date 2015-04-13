@@ -4,6 +4,11 @@
 
 (defn fetch-stats
   [{:keys [host port period] :or {host "localhost" port 3334 period 3600}}]
+  (let [url (str "http://" host ":" port "/stats")]
+    (:body (http/get url {:as :json}))))
+
+(defn fetch-stats-period
+  [{:keys [host port period] :or {host "localhost" port 3334 period 3600}}]
   (let [url (str "http://" host ":" port "/stats?period=" period)]
     (:body (http/get url {:as :json}))))
 
@@ -24,11 +29,11 @@
   (keyword (str "q/" queue "/" metric)))
 
 (defn get-queue-info
-  [stats queue period]
+  [stats stats-p queue period]
   (let [items (get-in stats [:gauges (mk-key queue "items")])
         age (get-in stats [:gauges (mk-key queue "age_msec")])
-        put (get-in stats [:counters (mk-key queue "put_items")])
-        get (get-in stats [:counters (mk-key queue "get_items_hit")])
+        put (get-in stats-p [:counters (mk-key queue "put_items")])
+        get (get-in stats-p [:counters (mk-key queue "get_items_hit")])
         put-rate (double (/ put period))
         get-rate (double (/ get period)) ]
     {"items" items "age" age
@@ -46,10 +51,11 @@
      :as conf}]
    (let [thresholds (merge-with merge default-thresholds thresholds)
          stats (fetch-stats conf)
+         stats-p (fetch-stats-period conf)
          infos (->> (all-queues stats)
                     (map (fn [queue]
                            [queue
-                            (get-queue-info stats queue period)]))
+                            (get-queue-info stats stats-p queue period)]))
                     (into {}))]
      (for [[queue data] infos
            [sname value] data]
