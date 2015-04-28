@@ -15,6 +15,4 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.slf4j/slf4j-api "1.7.10"]
-
-                 [cauchy "0.1.0-SNAPSHOT"]
                  [clj-http "1.0.1"]])

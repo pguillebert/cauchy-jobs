@@ -1,6 +1,12 @@
 (ns cauchy.jobs.kestrel
-  (:require [clj-http.client :as http]
-            [cauchy.jobs.utils :as utils]))
+  (:require [clj-http.client :as http]))
+
+(defn threshold
+  [{:keys [warn crit comp] :as conf} metric]
+  (cond
+   (comp metric crit) "critical"
+   (comp metric warn) "warning"
+   :else "ok"))
 
 (defn fetch-stats
   [{:keys [host port period] :or {host "localhost" port 3334 period 3600}}]
@@ -61,5 +67,5 @@
            [sname value] data]
        {:service (str queue "." sname)
         :metric value
-        :state (utils/threshold (get thresholds sname) value)})))
+        :state (threshold (get thresholds sname) value)})))
   ([] (kestrel-stats {})))
