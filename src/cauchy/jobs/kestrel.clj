@@ -38,8 +38,10 @@
   [stats stats-p queue period]
   (let [items (get-in stats [:gauges (mk-key queue "items")])
         age (get-in stats [:gauges (mk-key queue "age_msec")])
-        put (get-in stats-p [:counters (mk-key queue "put_items")])
-        get (get-in stats-p [:counters (mk-key queue "get_items_hit")])
+        ;; default to 0 when there is no stats-period
+        ;; because queue has just been created
+        put (get-in stats-p [:counters (mk-key queue "put_items")] 0)
+        get (get-in stats-p [:counters (mk-key queue "get_items_hit")] 0)
         put-rate (double (/ put period))
         get-rate (double (/ get period)) ]
     {"items" items "age" age
