@@ -1,4 +1,4 @@
-(defproject cauchy-jobs-kestrel "0.1.0-SNAPSHOT"
+(defproject cauchy-jobs-kestrel "0.1.0"
   :description "Cauchy jobs to monitor Kestrel queuing"
   :url "https://github.com/pguillebert/cauchy-jobs-kestrel"
   :scm {:name "git"
@@ -14,5 +14,5 @@
   :deploy-repositories [["clojars" {:creds :gpg}]]
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.slf4j/slf4j-api "1.7.10"]
-                 [clj-http "1.0.1"]])
+                 [org.slf4j/slf4j-api "1.7.12"]
+                 [clj-http "1.1.2"]])
